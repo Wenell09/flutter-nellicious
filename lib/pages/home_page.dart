@@ -6,6 +6,7 @@ import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/category_page.dart';
 import 'package:flutter_nellicious/pages/login_page.dart';
 import 'package:flutter_nellicious/pages/register_page.dart';
+import 'package:flutter_nellicious/pages/search_page.dart';
 import 'package:flutter_nellicious/widgets/product_card.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,10 +26,13 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         final List result = jsonDecode(response.body)["data"];
         debugPrint("jumlah product:${result.length}");
-        setState(() {
-          isLoading = false;
-          product = result.map((json) => ProductModel.fromJson(json)).toList();
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            product =
+                result.map((json) => ProductModel.fromJson(json)).toList();
+          });
+        }
       } else {
         throw Exception(response.body);
       }
@@ -46,45 +50,87 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: Text(
-            "Nellicious",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Badge.count(
-              count: 0,
-              child: Icon(
-                Icons.favorite_border,
-                size: 27,
-                color: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: AppBar(
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => SearchPage(),
+                )),
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Icon(
+                            Icons.search,
+                            size: 30,
+                            color: Colors.black,
+                          )),
+                      Expanded(
+                          flex: 6,
+                          child: Text(
+                            "Cari makanan/minuman disini!",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: IconButton(
+          backgroundColor: Colors.green,
+          title: Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Text(
+              "Nellicious",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
               onPressed: () {},
               icon: Badge.count(
                 count: 0,
                 child: Icon(
-                  Icons.shopping_cart_outlined,
+                  Icons.favorite_border,
                   size: 27,
                   color: Colors.white,
                 ),
               ),
             ),
-          )
-        ],
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: IconButton(
+                onPressed: () {},
+                icon: Badge.count(
+                  count: 0,
+                  child: Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 27,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
       body: Column(
         children: [

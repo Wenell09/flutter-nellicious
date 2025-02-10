@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/pages/home_page.dart';
 import 'package:flutter_nellicious/pages/profile_page.dart';
-import 'package:flutter_nellicious/pages/search_page.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -20,7 +19,6 @@ class _NavigationPageState extends State<NavigationPage> {
         index: index,
         children: [
           HomePage(),
-          SearchPage(),
           ProfilePage(),
         ],
       ),
@@ -33,7 +31,6 @@ class _NavigationPageState extends State<NavigationPage> {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Pencarian"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Akun"),
         ],
         backgroundColor: Colors.green,

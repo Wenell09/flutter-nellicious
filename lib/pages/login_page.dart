@@ -1,5 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_nellicious/data/const/base_url.dart';
+import 'package:flutter_nellicious/main.dart';
+import 'package:flutter_nellicious/pages/navigation_page.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,7 +18,57 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   TextEditingController inputEmail = TextEditingController();
   TextEditingController inputPassword = TextEditingController();
-  bool isShowPassword = false;
+  String errorText = "";
+  bool hidePassword = true;
+  bool isLoading = false;
+  bool isErrorLogin = false;
+
+  Future<void> loginUser(String email, String password) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      Map<String, dynamic> data = {"email": email, "password": password};
+      final response = await http.post(
+        Uri.parse("$baseUrl/login"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(data),
+      );
+      String message = jsonDecode(response.body)["message"];
+      if (response.statusCode == 200) {
+        debugPrint("result login:${response.body}");
+        String resultUserId = jsonDecode(response.body)["user_id"];
+        setState(() {
+          MyApp.of(context).userId = resultUserId;
+          isLoading = false;
+        });
+        MyApp.of(context).saveUserId();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => NavigationPage()),
+          (route) => false, // Menghapus semua halaman sebelumnya dari stack
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text(
+              message,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        );
+      } else {
+        debugPrint("error login");
+        setState(() {
+          isErrorLogin = true;
+          isLoading = false;
+          errorText = message;
+        });
+        throw Exception(message);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
                     controller: inputPassword,
-                    obscureText: isShowPassword,
+                    obscureText: hidePassword,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Pastikan password sudah terisi!";
@@ -126,16 +182,16 @@ class _LoginPageState extends State<LoginPage> {
                         child: IconButton(
                           onPressed: () {
                             setState(() {
-                              isShowPassword = !isShowPassword;
+                              hidePassword = !hidePassword;
                             });
                           },
-                          icon: (isShowPassword)
+                          icon: (hidePassword)
                               ? const Icon(
-                                  Icons.visibility,
+                                  Icons.visibility_off,
                                   color: Colors.black,
                                 )
                               : const Icon(
-                                  Icons.visibility_off,
+                                  Icons.visibility,
                                   color: Colors.black,
                                 ),
                         ),
@@ -157,32 +213,55 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 40,
               ),
-              UnconstrainedBox(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {
-                    if (formKey.currentState!.validate()) {
-                      debugPrint("sukses!");
-                    }
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: const Center(
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17),
+              (isLoading)
+                  ? UnconstrainedBox(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(50)),
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                    )
+                  : UnconstrainedBox(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(50),
+                        onTap: () {
+                          if (formKey.currentState!.validate()) {
+                            loginUser(inputEmail.text, inputPassword.text);
+                          }
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: const Center(
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )
+              SizedBox(height: 15),
+              (isErrorLogin)
+                  ? Center(
+                      child: Text(
+                        errorText,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  : Container()
             ],
           ),
         ),

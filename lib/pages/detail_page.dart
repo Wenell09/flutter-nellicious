@@ -56,13 +56,10 @@ class _DetailPageState extends State<DetailPage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Badge.count(
-              count: 0,
-              child: Icon(
-                Icons.favorite_border,
-                size: 27,
-                color: Colors.white,
-              ),
+            icon: Icon(
+              Icons.favorite_border,
+              size: 27,
+              color: Colors.white,
             ),
           ),
           Padding(

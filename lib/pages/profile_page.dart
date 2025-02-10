@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_nellicious/data/const/base_url.dart';
+import 'package:flutter_nellicious/data/models/user_model.dart';
 import 'package:flutter_nellicious/main.dart';
+import 'package:flutter_nellicious/pages/home_page.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,7 +15,31 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool isDark = false;
+  List<UserModel> user = [];
+  Future<void> getUser(String userId) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/account/$userId"));
+      if (response.statusCode == 200) {
+        debugPrint("result user:${response.body}");
+        final List result = jsonDecode(response.body)["data"];
+        setState(() {
+          user = result.map((json) => UserModel.fromJson(json)).toList();
+        });
+      } else {
+        debugPrint(response.body);
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  void initState() {
+    getUser(MyApp.of(context).userId);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,14 +61,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 70,
                   ),
                   Text(
-                    "Username",
+                    (user.isEmpty) ? "loading" : user[0].username,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Username@gmail.com",
+                    (user.isEmpty) ? "" : user[0].email,
                     style: TextStyle(fontSize: 15),
                   ),
                   const SizedBox(
@@ -98,11 +128,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           Divider(),
                           ListTile(
                               leading: Icon(
-                                (isDark) ? Icons.dark_mode : Icons.sunny,
-                                color: (isDark) ? Colors.blue : Colors.orange,
+                                (MyApp.of(context).isDarkMode)
+                                    ? Icons.dark_mode
+                                    : Icons.sunny,
+                                color: (MyApp.of(context).isDarkMode)
+                                    ? Colors.blue
+                                    : Colors.orange,
                               ),
                               title: Text(
-                                (isDark) ? "Mode gelap" : "Mode terang",
+                                (MyApp.of(context).isDarkMode)
+                                    ? "Mode gelap"
+                                    : "Mode terang",
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -121,13 +157,87 @@ class _ProfilePageState extends State<ProfilePage> {
                                 },
                               )),
                           Divider(),
-                          ListTile(
-                            leading: Icon(Icons.logout, color: Colors.red),
-                            title: Text(
-                              "Keluar",
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 20),
+                                    actionsAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    content: const Text(
+                                      "Apakah kamu yakin ingin keluar?",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text(
+                                          "Tidak",
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            MyApp.of(context).userId = "";
+                                          });
+                                          MyApp.of(context).saveUserId();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              duration: Duration(seconds: 1),
+                                              content: Text(
+                                                "Keluar berhasil!",
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ),
+                                          );
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage()),
+                                            (route) =>
+                                                false, // Menghapus semua halaman sebelumnya dari stack
+                                          );
+                                        },
+                                        child: const Text(
+                                          "Ya",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: ListTile(
+                              leading: Icon(Icons.logout, color: Colors.red),
+                              title: Text(
+                                "Keluar",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
