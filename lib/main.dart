@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'package:flutter_nellicious/data/const/base_url.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_nellicious/data/models/cart_model.dart';
 import 'package:flutter_nellicious/pages/home_page.dart';
 import 'package:flutter_nellicious/pages/navigation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +31,7 @@ class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.light;
   bool isDarkMode = false;
   String userId = "";
+  CartModel? cart;
 
   void loadUserId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -75,10 +80,35 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> getCartUser() async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/cart/$userId"));
+      if (response.statusCode == 200) {
+        debugPrint("result cart: ${response.body}");
+        final result = jsonDecode(response.body);
+        setState(() {
+          cart = CartModel.fromJson(result);
+        });
+      } else {
+        setState(() {
+          cart = null;
+        });
+        debugPrint("error get cart for user:$userId");
+        throw Exception("error get cart for user:$userId");
+      }
+    } catch (e) {
+      setState(() {
+        cart = null;
+      });
+      rethrow;
+    }
+  }
+
   @override
   void initState() {
     loadUserId();
     loadDarkMode();
+    Future.delayed(Duration(seconds: 2), () => getCartUser());
     super.initState();
   }
 

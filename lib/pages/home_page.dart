@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/product_model.dart';
 import 'package:flutter_nellicious/main.dart';
+import 'package:flutter_nellicious/pages/cart_page.dart';
 import 'package:flutter_nellicious/pages/category_page.dart';
 import 'package:flutter_nellicious/pages/login_page.dart';
 import 'package:flutter_nellicious/pages/register_page.dart';
@@ -20,6 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   List<ProductModel> product = [];
+
   Future<void> getProduct() async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/product"));
@@ -43,8 +45,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    getProduct();
     super.initState();
+    getProduct();
   }
 
   @override
@@ -118,9 +120,13 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.only(right: 10),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CartPage(
+                    cart: MyApp.of(context).cart,
+                  ),
+                )),
                 icon: Badge.count(
-                  count: 0,
+                  count: MyApp.of(context).cart?.data.length ?? 0,
                   child: Icon(
                     Icons.shopping_cart_outlined,
                     size: 27,
@@ -262,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    (index == 0) ? "Registrasi" : "Login",
+                                    (index == 0) ? "Register" : "Login",
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,

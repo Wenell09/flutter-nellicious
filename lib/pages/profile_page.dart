@@ -22,9 +22,11 @@ class _ProfilePageState extends State<ProfilePage> {
       if (response.statusCode == 200) {
         debugPrint("result user:${response.body}");
         final List result = jsonDecode(response.body)["data"];
-        setState(() {
-          user = result.map((json) => UserModel.fromJson(json)).toList();
-        });
+        if (mounted) {
+          setState(() {
+            user = result.map((json) => UserModel.fromJson(json)).toList();
+          });
+        }
       } else {
         debugPrint(response.body);
         throw Exception(response.body);
@@ -197,6 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             MyApp.of(context).userId = "";
                                           });
                                           MyApp.of(context).saveUserId();
+                                          MyApp.of(context).getCartUser();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(

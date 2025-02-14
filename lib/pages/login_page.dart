@@ -43,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = false;
         });
         MyApp.of(context).saveUserId();
+        MyApp.of(context).getCartUser();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => NavigationPage()),
           (route) => false, // Menghapus semua halaman sebelumnya dari stack
@@ -68,6 +69,13 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       rethrow;
     }
+  }
+
+  @override
+  void dispose() {
+    inputEmail.dispose();
+    inputPassword.dispose();
+    super.dispose();
   }
 
   @override
