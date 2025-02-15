@@ -5,6 +5,7 @@ import 'package:flutter_nellicious/data/models/product_model.dart';
 import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/cart_page.dart';
 import 'package:flutter_nellicious/pages/category_page.dart';
+import 'package:flutter_nellicious/pages/favorite_page.dart';
 import 'package:flutter_nellicious/pages/login_page.dart';
 import 'package:flutter_nellicious/pages/register_page.dart';
 import 'package:flutter_nellicious/pages/search_page.dart';
@@ -107,9 +108,13 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      FavoritePage(favorite: MyApp.of(context).favorite))),
               icon: Badge.count(
-                count: 0,
+                count: (MyApp.of(context).favorite.isEmpty)
+                    ? 0
+                    : MyApp.of(context).favorite.length,
                 child: Icon(
                   Icons.favorite_border,
                   size: 27,

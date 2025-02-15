@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_nellicious/data/const/base_url.dart';
+import 'package:flutter_nellicious/data/models/favorite_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
   bool isDarkMode = false;
   String userId = "";
   CartModel? cart;
+  List<FavoriteModel> favorite = [];
 
   void loadUserId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -104,11 +106,39 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> getFavoriteUser() async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/favorite/$userId"));
+      if (response.statusCode == 200) {
+        debugPrint("result favorite user:${response.body}");
+        final List result = jsonDecode(response.body)["data"];
+        setState(() {
+          favorite =
+              result.map((json) => FavoriteModel.fromJson(json)).toList();
+        });
+      } else {
+        setState(() {
+          favorite.clear();
+        });
+        debugPrint("Error get favorite user :$userId");
+        throw Exception("Error get favorite user :$userId");
+      }
+    } catch (e) {
+      setState(() {
+        favorite.clear();
+      });
+      rethrow;
+    }
+  }
+
   @override
   void initState() {
     loadUserId();
     loadDarkMode();
-    Future.delayed(Duration(seconds: 2), () => getCartUser());
+    Future.delayed(Duration(seconds: 2), () {
+      getFavoriteUser();
+      getCartUser();
+    });
     super.initState();
   }
 

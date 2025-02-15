@@ -50,9 +50,16 @@ class _CartPageState extends State<CartPage> {
           await http.delete(Uri.parse("$baseUrl/deleteCart/$userId/$cartId"));
       if (response.statusCode == 200) {
         debugPrint("delete cart:${response.body}");
-        if (mounted) {
-          MyApp.of(context).getCartUser();
-        }
+        MyApp.of(context).getCartUser();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text(
+              "delete produk berhasil!",
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        );
       } else {
         debugPrint("error delete cart:${response.body}");
         throw Exception(response.body);
@@ -262,20 +269,6 @@ class _CartPageState extends State<CartPage> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        duration:
-                                                                            Duration(seconds: 1),
-                                                                        content:
-                                                                            Text(
-                                                                          "delete produk berhasil!",
-                                                                          style:
-                                                                              TextStyle(fontSize: 16),
-                                                                        ),
-                                                                      ),
-                                                                    );
                                                                   },
                                                                   child:
                                                                       const Text(

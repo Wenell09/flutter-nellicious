@@ -82,6 +82,63 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  Future<void> addFavorite(String productId) async {
+    try {
+      final Map<String, dynamic> data = {
+        "user_id": MyApp.of(context).userId,
+        "product_id": productId,
+      };
+      final response = await http.post(
+        Uri.parse("$baseUrl/addFavorite"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(data),
+      );
+      if (response.statusCode == 200) {
+        debugPrint(response.body);
+        MyApp.of(context).getFavoriteUser();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text(
+              "tambah favorite berhasil!",
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        );
+      } else {
+        debugPrint(response.body);
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFavorite(String userId, String favoriteId) async {
+    try {
+      final response = await http
+          .delete(Uri.parse("$baseUrl/deleteFavorite/$userId/$favoriteId"));
+      if (response.statusCode == 200) {
+        debugPrint(response.body);
+        MyApp.of(context).getFavoriteUser();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text(
+              "hapus favorite berhasil!",
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        );
+      } else {
+        debugPrint(response.body);
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   void initState() {
     getDetailProduct(widget.productId);
@@ -101,9 +158,43 @@ class _DetailPageState extends State<DetailPage> {
             )),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (MyApp.of(context).userId.isEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      content: const Text(
+                        "Login terlebih dahulu!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  },
+                );
+              } else {
+                bool isFavorite = MyApp.of(context).favorite.any(
+                    (result) => result.product.productId == widget.productId);
+                if (isFavorite) {
+                  var favorite = MyApp.of(context).favorite.firstWhere(
+                        (result) =>
+                            result.product.productId == widget.productId,
+                      );
+                  deleteFavorite(MyApp.of(context).userId, favorite.favoriteId);
+                } else {
+                  addFavorite(widget.productId);
+                }
+              }
+            },
             icon: Icon(
-              Icons.favorite_border,
+              (MyApp.of(context).favorite.any(
+                      (result) => result.product.productId == widget.productId))
+                  ? Icons.favorite
+                  : Icons.favorite_border_outlined,
               size: 27,
               color: Colors.white,
             ),
