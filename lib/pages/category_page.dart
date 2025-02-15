@@ -20,10 +20,12 @@ class _CategoryPageState extends State<CategoryPage> {
   List<ProductModel> product = [];
   Future<void> getProduct() async {
     try {
-      final response = await http.get(Uri.parse("$baseUrl/product"));
+      final response = await http
+          .get(Uri.parse("$baseUrl/product/category/${widget.categoryId}"));
       if (response.statusCode == 200) {
         final List result = jsonDecode(response.body)["data"];
-        debugPrint("jumlah product:${result.length}");
+        debugPrint(
+            "jumlah product category ${widget.categoryId}:${result.length}");
         setState(() {
           isLoading = false;
           product = result.map((json) => ProductModel.fromJson(json)).toList();

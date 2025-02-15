@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/product_model.dart';
@@ -54,10 +52,10 @@ class _ProductCardState extends State<ProductCard> {
     }
   }
 
-  Future<void> deleteFavorite(String userId, String favoriteId) async {
+  Future<void> deleteFavorite(String userId, String productId) async {
     try {
       final response = await http
-          .delete(Uri.parse("$baseUrl/deleteFavorite/$userId/$favoriteId"));
+          .delete(Uri.parse("$baseUrl/deleteFavorite/$userId/$productId"));
       if (response.statusCode == 200) {
         debugPrint(response.body);
         MyApp.of(context).getFavoriteUser();
@@ -213,12 +211,8 @@ class _ProductCardState extends State<ProductCard> {
                           (result) =>
                               result.product.productId == data.productId);
                       if (isFavorite) {
-                        var favorite = MyApp.of(context).favorite.firstWhere(
-                              (result) =>
-                                  result.product.productId == data.productId,
-                            );
                         deleteFavorite(
-                            MyApp.of(context).userId, favorite.favoriteId);
+                            MyApp.of(context).userId, data.productId);
                       } else {
                         addFavorite(data.productId);
                       }

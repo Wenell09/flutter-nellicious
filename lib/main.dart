@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/favorite_model.dart';
+import 'package:flutter_nellicious/pages/splash_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nellicious/data/models/cart_model.dart';
-import 'package:flutter_nellicious/pages/home_page.dart';
-import 'package:flutter_nellicious/pages/navigation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -150,7 +149,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
       title: "Nellicious App",
-      home: (userId.isEmpty) ? HomePage() : NavigationPage(),
+      home: SplashPage(),
     );
   }
 }

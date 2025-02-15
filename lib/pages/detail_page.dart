@@ -114,10 +114,10 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Future<void> deleteFavorite(String userId, String favoriteId) async {
+  Future<void> deleteFavorite(String userId, String productId) async {
     try {
       final response = await http
-          .delete(Uri.parse("$baseUrl/deleteFavorite/$userId/$favoriteId"));
+          .delete(Uri.parse("$baseUrl/deleteFavorite/$userId/$productId"));
       if (response.statusCode == 200) {
         debugPrint(response.body);
         MyApp.of(context).getFavoriteUser();
@@ -180,11 +180,7 @@ class _DetailPageState extends State<DetailPage> {
                 bool isFavorite = MyApp.of(context).favorite.any(
                     (result) => result.product.productId == widget.productId);
                 if (isFavorite) {
-                  var favorite = MyApp.of(context).favorite.firstWhere(
-                        (result) =>
-                            result.product.productId == widget.productId,
-                      );
-                  deleteFavorite(MyApp.of(context).userId, favorite.favoriteId);
+                  deleteFavorite(MyApp.of(context).userId, widget.productId);
                 } else {
                   addFavorite(widget.productId);
                 }
