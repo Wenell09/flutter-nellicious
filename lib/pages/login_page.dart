@@ -44,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
         });
         MyApp.of(context).saveUserId();
         MyApp.of(context).getCartUser();
+        MyApp.of(context).getFavoriteUser();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => NavigationPage()),
           (route) => false, // Menghapus semua halaman sebelumnya dari stack

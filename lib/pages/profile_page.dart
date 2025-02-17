@@ -1,10 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/user_model.dart';
 import 'package:flutter_nellicious/main.dart';
+import 'package:flutter_nellicious/pages/edit_account_page.dart';
 import 'package:flutter_nellicious/pages/home_page.dart';
+import 'package:flutter_nellicious/pages/information_account_page.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
@@ -33,6 +35,34 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<void> navigateToEditAccountPage() async {
+    bool? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => EditAccountPage(
+                username: (user.isEmpty) ? "" : user[0].username,
+                email: (user.isEmpty) ? "" : user[0].email,
+                password: (user.isEmpty) ? "" : user[0].password,
+              )),
+    );
+    if (result == true) {
+      getUser(MyApp.of(context).userId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(
+            seconds: 1,
+          ),
+          content: Text(
+            "Berhasil update akun!",
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
     }
   }
 
@@ -76,44 +106,54 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    width: 120,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      color: (MyApp.of(context).isDarkMode)
-                          ? Colors.white
-                          : Colors.black,
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Edit Akun",
-                        style: TextStyle(
-                            color: (MyApp.of(context).isDarkMode)
-                                ? Colors.black
-                                : Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15),
+                  GestureDetector(
+                    onTap: navigateToEditAccountPage,
+                    child: Container(
+                      width: 120,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: (MyApp.of(context).isDarkMode)
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Edit Akun",
+                          style: TextStyle(
+                              color: (MyApp.of(context).isDarkMode)
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15),
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.grey[350],
-                          borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(10)),
                       child: Column(
                         children: [
-                          ListTile(
-                            leading: Icon(Icons.person, color: Colors.indigo),
-                            title: Text(
-                              "Informasi akun",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                          GestureDetector(
+                            onTap: () =>
+                                Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  InformationAccountPage(user: user),
+                            )),
+                            child: ListTile(
+                              leading: Icon(Icons.person, color: Colors.indigo),
+                              title: Text(
+                                "Informasi akun",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
                           Divider(),
@@ -122,6 +162,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 color: Colors.green),
                             title: Text(
                               "Riwayat transaksi",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ),
+                          Divider(),
+                          ListTile(
+                            leading: Icon(Icons.star, color: Colors.yellow),
+                            title: Text(
+                              "Rating produk",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
@@ -200,6 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           });
                                           MyApp.of(context).saveUserId();
                                           MyApp.of(context).getCartUser();
+                                          MyApp.of(context).getFavoriteUser();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
