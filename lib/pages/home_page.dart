@@ -156,7 +156,11 @@ class _HomePageState extends State<HomePage> {
                     width: double.infinity,
                     height: 155,
                     decoration: BoxDecoration(
-                      color: Colors.grey,
+                      color: Colors.greenAccent,
+                      image: DecorationImage(
+                        image: AssetImage("images/banner.jpg"),
+                        fit: BoxFit.cover,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),

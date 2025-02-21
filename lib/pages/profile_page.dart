@@ -169,16 +169,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Divider(),
                           ListTile(
-                            leading: Icon(Icons.star, color: Colors.yellow),
-                            title: Text(
-                              "Rating produk",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Divider(),
-                          ListTile(
                               leading: Icon(
                                 (MyApp.of(context).isDarkMode)
                                     ? Icons.dark_mode
