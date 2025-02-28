@@ -70,6 +70,12 @@ class _FavoritePageState extends State<FavoritePage> {
                                           topLeft: Radius.circular(10),
                                           bottomLeft: Radius.circular(10)),
                                       child: Image.network(
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        },
                                         data.product.image,
                                         fit: BoxFit.cover,
                                         height: double.infinity,

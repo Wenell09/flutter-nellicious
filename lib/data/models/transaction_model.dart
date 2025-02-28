@@ -22,7 +22,7 @@ class TransactionModel {
     return TransactionModel(
       transactionId: json["transaction_id"] ?? "",
       quantity: json["quantity"] ?? 0,
-      totalPrice: json["totalPrice"] ?? 0,
+      totalPrice: json["total_price"] ?? 0,
       user: UserModel.fromJson(json["user"]),
       product: ProductModel.fromJson(json["product"]),
       createdAt: json["created_at"] ?? "",

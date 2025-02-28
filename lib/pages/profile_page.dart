@@ -5,6 +5,7 @@ import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/user_model.dart';
 import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/edit_account_page.dart';
+import 'package:flutter_nellicious/pages/history_transaction_page.dart';
 import 'package:flutter_nellicious/pages/home_page.dart';
 import 'package:flutter_nellicious/pages/information_account_page.dart';
 import 'package:http/http.dart' as http;
@@ -157,14 +158,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           Divider(),
-                          ListTile(
-                            leading: Icon(Icons.shopping_cart_rounded,
-                                color: Colors.green),
-                            title: Text(
-                              "Riwayat transaksi",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                          GestureDetector(
+                            onTap: () =>
+                                Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => HistoryTransactionPage(),
+                            )),
+                            child: ListTile(
+                              leading: Icon(Icons.shopping_cart_rounded,
+                                  color: Colors.green),
+                              title: Text(
+                                "Riwayat transaksi",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
                           Divider(),

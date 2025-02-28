@@ -5,6 +5,7 @@ import 'package:flutter_nellicious/data/const/base_url.dart';
 import 'package:flutter_nellicious/data/models/cart_model.dart';
 import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/detail_page.dart';
+import 'package:flutter_nellicious/pages/payment_page.dart';
 import 'package:http/http.dart' as http;
 
 class CartPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   bool isLoadingTransaction = false;
+  String midtransToken = "";
 
   Future<void> updateCart(String userId, String productId, int quantity) async {
     try {
@@ -31,12 +33,12 @@ class _CartPageState extends State<CartPage> {
         body: jsonEncode(data),
       );
       if (response.statusCode == 200) {
-        debugPrint("Add cart:${response.body}");
+        debugPrint("update cart:${response.body}");
         if (mounted) {
           MyApp.of(context).getCartUser();
         }
       } else {
-        debugPrint("Error add Cart:${response.body}");
+        debugPrint("Error update Cart:${response.body}");
         throw Exception(response.body);
       }
     } catch (e) {
@@ -62,6 +64,47 @@ class _CartPageState extends State<CartPage> {
         );
       } else {
         debugPrint("error delete cart:${response.body}");
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> createTransactionMidtrans(String userId, List items) async {
+    try {
+      setState(() {
+        isLoadingTransaction = true;
+      });
+      Map<String, dynamic> data = {
+        "user_id": userId,
+        "items": items,
+      };
+      final response = await http.post(
+        Uri.parse("$baseUrl/createMidtransTransaction"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(data),
+      );
+      if (response.statusCode == 200) {
+        debugPrint(response.body);
+        final String result = jsonDecode(response.body)["token"];
+        setState(() {
+          midtransToken = result;
+          isLoadingTransaction = false;
+        });
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PaymentPage(
+              midtransToken: midtransToken,
+              items: items,
+            ),
+          ),
+        );
+      } else {
+        setState(() {
+          isLoadingTransaction = false;
+        });
+        debugPrint(response.body);
         throw Exception(response.body);
       }
     } catch (e) {
@@ -145,6 +188,12 @@ class _CartPageState extends State<CartPage> {
                                                               Radius.circular(
                                                                   10)),
                                                   child: Image.network(
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return Center(
+                                                          child:
+                                                              CircularProgressIndicator());
+                                                    },
                                                     data.product.image,
                                                     fit: BoxFit.cover,
                                                     height: double.infinity,
@@ -384,28 +433,48 @@ class _CartPageState extends State<CartPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: (isLoadingTransaction)
-                              ? Colors.grey
-                              : Colors.white,
-                        ),
-                        child: (isLoadingTransaction)
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : Center(
-                                child: Text(
-                                  "Lanjutkan pembayaran",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                      GestureDetector(
+                        onTap: () {
+                          if (widget.cart!.data.isEmpty) {
+                            debugPrint("data cart kosong");
+                            return;
+                          } else {
+                            final List items = widget.cart!.data.map((item) {
+                              return {
+                                "product_id": item.product.productId,
+                                "name": item.product.name,
+                                "price": item.product.price,
+                                "quantity": item.quantity,
+                                "total_price": item.totalPrice
+                              };
+                            }).toList();
+                            createTransactionMidtrans(
+                                MyApp.of(context).userId, items);
+                          }
+                        },
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: (isLoadingTransaction)
+                                ? Colors.grey
+                                : Colors.white,
+                          ),
+                          child: (isLoadingTransaction)
+                              ? Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : Center(
+                                  child: Text(
+                                    "Lanjutkan pembayaran",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ),
-                              ),
+                        ),
                       )
                     ],
                   ),

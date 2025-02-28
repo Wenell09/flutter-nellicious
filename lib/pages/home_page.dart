@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/data/const/base_url.dart';
+import 'package:flutter_nellicious/data/models/cart_model.dart';
 import 'package:flutter_nellicious/data/models/product_model.dart';
 import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/cart_page.dart';
@@ -127,7 +128,8 @@ class _HomePageState extends State<HomePage> {
               child: IconButton(
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => CartPage(
-                    cart: MyApp.of(context).cart,
+                    cart: MyApp.of(context).cart ??
+                        CartModel(data: [], totalBayar: 0),
                   ),
                 )),
                 icon: Badge.count(
