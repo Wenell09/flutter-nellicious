@@ -157,6 +157,7 @@ class _CartPageState extends State<CartPage> {
                             )
                           : ListView.builder(
                               shrinkWrap: true,
+                              physics: ScrollPhysics(),
                               itemBuilder: (context, index) {
                                 final data = widget.cart!.data[index];
                                 return Padding(

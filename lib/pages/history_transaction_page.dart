@@ -84,6 +84,7 @@ class _HistoryTransactionPageState extends State<HistoryTransactionPage> {
                       )
                     : ListView.builder(
                         shrinkWrap: true,
+                        physics: ScrollPhysics(),
                         itemBuilder: (context, index) {
                           final data = transaction[index];
                           return Padding(

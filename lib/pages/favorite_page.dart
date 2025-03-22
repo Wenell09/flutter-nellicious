@@ -45,6 +45,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 )
               : ListView.builder(
                   shrinkWrap: true,
+                  physics: ScrollPhysics(),
                   itemBuilder: (context, index) {
                     final data = widget.favorite[index];
                     return Padding(
