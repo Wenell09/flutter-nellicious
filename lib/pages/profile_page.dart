@@ -197,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 key: ValueKey<bool>(
                                     MyApp.of(context).isDarkMode),
                                 value: MyApp.of(context).isDarkMode,
-                                activeColor: Colors.white,
+                                activeThumbColor: Colors.white,
                                 activeTrackColor: Colors.grey[700],
                                 inactiveTrackColor: Colors.white,
                                 inactiveThumbColor: Colors.grey[700],

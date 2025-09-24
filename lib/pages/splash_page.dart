@@ -1,25 +1,33 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_nellicious/main.dart';
 import 'package:flutter_nellicious/pages/home_page.dart';
 import 'package:flutter_nellicious/pages/navigation_page.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Future.delayed(
-      Duration(seconds: 1),
-      () => Navigator.of(context).pushReplacement(
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => (MyApp.of(context).userId.isEmpty)
-              ? HomePage()
-              : NavigationPage(),
+              ? const HomePage()
+              : const NavigationPage(),
         ),
-      ),
-    );
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green,
       body: Center(
@@ -39,14 +47,14 @@ class SplashPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
+              const Text(
                 "Welcome to nellicious",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                   color: Colors.white,
                 ),
-              )
+              ),
             ],
           ),
         ),
